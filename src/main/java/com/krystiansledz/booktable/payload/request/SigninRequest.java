@@ -2,7 +2,7 @@ package com.krystiansledz.booktable.payload.request;
 
 import jakarta.validation.constraints.NotBlank;
 
-public class LoginRequest {
+public class SigninRequest {
     @NotBlank
     private String email;
 
@@ -24,5 +24,4 @@ public class LoginRequest {
     public void setPassword(String password) {
         this.password = password;
     }
-
 }

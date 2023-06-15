@@ -5,20 +5,19 @@ import com.krystiansledz.booktable.models.Customer;
 import com.krystiansledz.booktable.models.UserType;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
-import org.springframework.security.core.userdetails.UserDetails;
 
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Objects;
 
-public class CustomerPrincipal implements UserDetails {
+public class CustomerPrincipal implements UserPrincipal {
     private Long id;
     private String email;
     @JsonIgnore
     private String password;
     private UserType userType;
 
-    public CustomerPrincipal(Long id, String email, String password, UserType userType ) {
+    public CustomerPrincipal(Long id, String email, String password, UserType userType) {
         this.id = id;
         this.email = email;
         this.password = password;
@@ -30,16 +29,18 @@ public class CustomerPrincipal implements UserDetails {
                 customer.getEmail(),
                 customer.getPassword(),
                 customer.getUserType()
-                );
+        );
     }
 
-    // Getters and Setters
+    @Override
+    public Collection<? extends GrantedAuthority> getAuthorities() {
+        return Collections.singletonList(new SimpleGrantedAuthority("CUSTOMER"));
+    }
 
     @Override
     public String getUsername() {
         return email;
     }
-
 
     public Long getId() {
         return id;
@@ -49,17 +50,14 @@ public class CustomerPrincipal implements UserDetails {
         return email;
     }
 
-
     public String getPassword() {
         return password;
     }
 
-    public UserType getUserType() { return userType; }
-
-    @Override
-    public Collection<? extends GrantedAuthority> getAuthorities() {
-        return Collections.singletonList(new SimpleGrantedAuthority("CUSTOMER"));
+    public UserType getUserType() {
+        return userType;
     }
+
 
     @Override
     public boolean isAccountNonExpired() {

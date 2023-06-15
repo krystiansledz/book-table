@@ -1,19 +1,21 @@
 package com.krystiansledz.booktable.payload.request;
 
-import jakarta.validation.constraints.*;
+import com.krystiansledz.booktable.validation.ConditionalValidation;
+import jakarta.validation.constraints.NotBlank;
 
-public class RestaurantSignupRequest {
+@ConditionalValidation(
+        conditionalProperty = "userType", values = {"restaurant"},
+        requiredProperties = {"name"},
+        message = "must not be blank")
+public class SignupRequest {
     @NotBlank
-    @Size(max = 50)
-    @Email
     private String email;
 
     @NotBlank
-    @Size(max = 120)
     private String password;
-
     @NotBlank
-    @Size(max = 40)
+    private String userType;
+
     private String name;
 
     public String getEmail() {
@@ -30,6 +32,14 @@ public class RestaurantSignupRequest {
 
     public void setPassword(String password) {
         this.password = password;
+    }
+
+    public String getUserType() {
+        return userType;
+    }
+
+    public void setUserType(String userType) {
+        this.userType = userType;
     }
 
     public String getName() {

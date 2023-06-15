@@ -2,8 +2,7 @@ package com.krystiansledz.booktable.security;
 
 import com.krystiansledz.booktable.security.jwt.AuthEntryPointJwt;
 import com.krystiansledz.booktable.security.jwt.AuthTokenFilter;
-import com.krystiansledz.booktable.security.services.CustomerService;
-import com.krystiansledz.booktable.security.services.RestaurantService;
+import com.krystiansledz.booktable.security.services.UserDetailsServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -23,10 +22,7 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 @EnableMethodSecurity
 public class WebSecurityConfig {
     @Autowired
-    CustomerService customerDetailsService;
-
-    @Autowired
-    RestaurantService restaurantDetailsService;
+    UserDetailsServiceImpl userDetailsService;
 
     @Autowired
     private AuthEntryPointJwt unauthorizedHandler;
@@ -37,20 +33,10 @@ public class WebSecurityConfig {
     }
 
     @Bean
-    public DaoAuthenticationProvider customerAuthenticationProvider() {
+    public DaoAuthenticationProvider authenticationProvider() {
         DaoAuthenticationProvider authProvider = new DaoAuthenticationProvider();
 
-        authProvider.setUserDetailsService(customerDetailsService);
-        authProvider.setPasswordEncoder(passwordEncoder());
-
-        return authProvider;
-    }
-
-    @Bean
-    public DaoAuthenticationProvider restaurantAuthenticationProvider() {
-        DaoAuthenticationProvider authProvider = new DaoAuthenticationProvider();
-
-        authProvider.setUserDetailsService(restaurantDetailsService);
+        authProvider.setUserDetailsService(userDetailsService);
         authProvider.setPasswordEncoder(passwordEncoder());
 
         return authProvider;
@@ -77,8 +63,7 @@ public class WebSecurityConfig {
                 .anyRequest().authenticated()
         );
 
-        http.authenticationProvider(customerAuthenticationProvider()); // Use the Customer AuthenticationProvider
-        http.authenticationProvider(restaurantAuthenticationProvider()); // Use the Restaurant AuthenticationProvider
+        http.authenticationProvider(authenticationProvider());
 
         http.addFilterBefore(authenticationJwtTokenFilter(), UsernamePasswordAuthenticationFilter.class);
 

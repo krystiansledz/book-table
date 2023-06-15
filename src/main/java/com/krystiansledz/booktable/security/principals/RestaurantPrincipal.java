@@ -5,22 +5,18 @@ import com.krystiansledz.booktable.models.Restaurant;
 import com.krystiansledz.booktable.models.UserType;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
-import org.springframework.security.core.userdetails.UserDetails;
 
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Objects;
 
-public class RestaurantPrincipal implements UserDetails {
+public class RestaurantPrincipal implements UserPrincipal {
     private Long id;
     private String email;
     @JsonIgnore
     private String password;
-
     private String name;
-
     private UserType userType;
-
 
     public RestaurantPrincipal(Long id, String email, String password, String name, UserType userType) {
         this.id = id;
@@ -36,16 +32,13 @@ public class RestaurantPrincipal implements UserDetails {
                 restaurant.getPassword(),
                 restaurant.getName(),
                 restaurant.getUserType()
-                );
+        );
     }
-
-    // Getters and Setters
 
     @Override
     public String getUsername() {
         return email;
     }
-
 
     public Long getId() {
         return id;
@@ -62,8 +55,10 @@ public class RestaurantPrincipal implements UserDetails {
     public String getName() {
         return name;
     }
-    public UserType getUserType() { return userType; }
 
+    public UserType getUserType() {
+        return userType;
+    }
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {

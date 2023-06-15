@@ -4,7 +4,6 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class Utils {
-
     public static Map<String, String> createErrorMap(String[] fields, String[] messages) {
         Map<String, String> errorMap = new HashMap<>();
 

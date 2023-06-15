@@ -1,7 +1,7 @@
 package com.krystiansledz.booktable.security.jwt;
 
 import com.krystiansledz.booktable.models.UserType;
-import com.krystiansledz.booktable.security.principals.CustomerPrincipal;
+import com.krystiansledz.booktable.security.principals.UserPrincipal;
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
@@ -9,7 +9,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
 
 import java.security.Key;
@@ -27,11 +26,11 @@ public class JwtUtils {
 
     public String generateJwtToken(Authentication authentication) {
 
-        UserDetails userPrincipal = (UserDetails) authentication.getPrincipal();
+        UserPrincipal userPrincipal = (UserPrincipal) authentication.getPrincipal();
 
         return Jwts.builder()
                 .setSubject((userPrincipal.getUsername()))
-                .claim("userType", ((CustomerPrincipal) userPrincipal).getUserType().toString())
+                .claim("userType", (userPrincipal).getUserType().toString())
                 .setIssuedAt(new Date())
                 .setExpiration(new Date((new Date()).getTime() + jwtExpirationMs))
                 .signWith(key(), SignatureAlgorithm.HS256)
@@ -59,6 +58,7 @@ public class JwtUtils {
     }
 
     public boolean validateJwtToken(String authToken) {
+        System.out.println(authToken);
         try {
             Jwts.parserBuilder().setSigningKey(key()).build().parse(authToken);
             return true;

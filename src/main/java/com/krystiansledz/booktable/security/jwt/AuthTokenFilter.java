@@ -21,18 +21,15 @@ import org.springframework.web.filter.OncePerRequestFilter;
 import java.io.IOException;
 
 public class AuthTokenFilter extends OncePerRequestFilter {
+    private static final Logger logger = LoggerFactory.getLogger(AuthTokenFilter.class);
     @Autowired
     private JwtUtils jwtUtils;
-
     @Autowired
     @Qualifier("customerService")
     private CustomerService customerService;
-
     @Autowired
     @Qualifier("restaurantService")
     private RestaurantService restaurantService;
-
-    private static final Logger logger = LoggerFactory.getLogger(AuthTokenFilter.class);
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
@@ -47,8 +44,13 @@ public class AuthTokenFilter extends OncePerRequestFilter {
 
                 if (userType == UserType.CUSTOMER) {
                     userDetails = customerService.loadUserByUsername(username);
-                } else {
+                }
+                if (userType == UserType.RESTAURANT) {
                     userDetails = restaurantService.loadUserByUsername(username);
+                }
+
+                if (userDetails == null) {
+                    throw new Exception("userDetails == null");
                 }
 
                 UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(userDetails, null,
