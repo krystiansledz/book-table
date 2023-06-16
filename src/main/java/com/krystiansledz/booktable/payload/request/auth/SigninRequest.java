@@ -1,4 +1,4 @@
-package com.krystiansledz.booktable.payload.request;
+package com.krystiansledz.booktable.payload.request.auth;
 
 import jakarta.validation.constraints.NotBlank;
 

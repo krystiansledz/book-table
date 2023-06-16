@@ -1,4 +1,4 @@
-package com.krystiansledz.booktable.payload.request;
+package com.krystiansledz.booktable.payload.request.auth;
 
 import com.krystiansledz.booktable.validation.ConditionalValidation;
 import jakarta.validation.constraints.NotBlank;

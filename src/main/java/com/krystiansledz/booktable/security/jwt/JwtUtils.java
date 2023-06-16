@@ -1,6 +1,6 @@
 package com.krystiansledz.booktable.security.jwt;
 
-import com.krystiansledz.booktable.models.UserType;
+import com.krystiansledz.booktable.enums.UserType;
 import com.krystiansledz.booktable.security.principals.UserPrincipal;
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.io.Decoders;
@@ -58,7 +58,6 @@ public class JwtUtils {
     }
 
     public boolean validateJwtToken(String authToken) {
-        System.out.println(authToken);
         try {
             Jwts.parserBuilder().setSigningKey(key()).build().parse(authToken);
             return true;

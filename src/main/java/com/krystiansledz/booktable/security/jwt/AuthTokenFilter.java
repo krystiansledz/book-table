@@ -1,6 +1,6 @@
 package com.krystiansledz.booktable.security.jwt;
 
-import com.krystiansledz.booktable.models.UserType;
+import com.krystiansledz.booktable.enums.UserType;
 import com.krystiansledz.booktable.security.services.CustomerService;
 import com.krystiansledz.booktable.security.services.RestaurantService;
 import jakarta.servlet.FilterChain;

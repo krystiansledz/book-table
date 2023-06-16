@@ -1,5 +1,6 @@
 package com.krystiansledz.booktable.models;
 
+import com.krystiansledz.booktable.enums.UserType;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;

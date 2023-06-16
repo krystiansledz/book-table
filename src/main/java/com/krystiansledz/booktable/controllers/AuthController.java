@@ -1,11 +1,11 @@
 package com.krystiansledz.booktable.controllers;
 
 import com.krystiansledz.booktable.Utils;
+import com.krystiansledz.booktable.enums.UserType;
 import com.krystiansledz.booktable.models.Customer;
 import com.krystiansledz.booktable.models.Restaurant;
-import com.krystiansledz.booktable.models.UserType;
-import com.krystiansledz.booktable.payload.request.SigninRequest;
-import com.krystiansledz.booktable.payload.request.SignupRequest;
+import com.krystiansledz.booktable.payload.request.auth.SigninRequest;
+import com.krystiansledz.booktable.payload.request.auth.SignupRequest;
 import com.krystiansledz.booktable.payload.response.JwtResponse;
 import com.krystiansledz.booktable.payload.response.MessageResponse;
 import com.krystiansledz.booktable.repository.CustomerRepository;
@@ -25,7 +25,7 @@ import org.springframework.web.bind.annotation.*;
 
 @CrossOrigin(origins = "*", maxAge = 3600)
 @RestController
-@RequestMapping("/api/auth")
+@RequestMapping("/api/v1/auth")
 public class AuthController {
     @Autowired
     AuthenticationManager authenticationManager;
@@ -54,7 +54,7 @@ public class AuthController {
         SecurityContextHolder.getContext().setAuthentication(authentication);
         String jwt = jwtUtils.generateJwtToken(authentication);
 
-        return ResponseEntity.ok(new JwtResponse(jwt));
+        return ResponseEntity.status(HttpStatus.OK).body(new JwtResponse(jwt));
     }
 
     @PostMapping("/signup")
@@ -68,7 +68,7 @@ public class AuthController {
             Customer customer = new Customer(signUpRequest.getEmail(),
                     encoder.encode(signUpRequest.getPassword()));
             customerRepository.save(customer);
-            return ResponseEntity.ok(new MessageResponse("Customer registered successfully!"));
+            return ResponseEntity.status(HttpStatus.CREATED).body(new MessageResponse("Customer registered successfully!"));
         }
 
 
@@ -77,7 +77,7 @@ public class AuthController {
             Restaurant restaurant = new Restaurant(signUpRequest.getEmail(),
                     encoder.encode(signUpRequest.getPassword()), signUpRequest.getName());
             restaurantRepository.save(restaurant);
-            return ResponseEntity.ok(new MessageResponse("Restaurant registered successfully!"));
+            return ResponseEntity.status(HttpStatus.CREATED).body(new MessageResponse("Restaurant registered successfully!"));
         }
 
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Something went wrong");

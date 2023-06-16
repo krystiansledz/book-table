@@ -1,8 +1,8 @@
 package com.krystiansledz.booktable.security.principals;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.krystiansledz.booktable.enums.UserType;
 import com.krystiansledz.booktable.models.Customer;
-import com.krystiansledz.booktable.models.UserType;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 

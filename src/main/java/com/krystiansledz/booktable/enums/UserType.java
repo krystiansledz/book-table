@@ -1,4 +1,4 @@
-package com.krystiansledz.booktable.models;
+package com.krystiansledz.booktable.enums;
 
 public enum UserType {
     CUSTOMER,
