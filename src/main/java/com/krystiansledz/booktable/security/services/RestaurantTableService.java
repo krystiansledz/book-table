@@ -22,8 +22,8 @@ public class RestaurantTableService {
     @Autowired
     private RestaurantRepository restaurantRepository;
 
-    public List<RestaurantTable> getAllTables() {
-        return restaurantTableRepository.findAll();
+    public List<RestaurantTable> getAllTables(Long restaurantId) {
+        return restaurantTableRepository.findAllByRestaurantId(restaurantId);
     }
 
     public RestaurantTable getRestaurantTableById(Long id) {

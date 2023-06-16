@@ -16,15 +16,15 @@ import java.util.stream.Collectors;
 
 @CrossOrigin(origins = "*", maxAge = 3600)
 @RestController
-@RequestMapping("/api/v1/restaurant-tables")
+@RequestMapping("/api/v1/restaurants/{restaurantId}/tables")
 public class RestaurantTableController {
 
     @Autowired
     private RestaurantTableService restaurantTableService;
 
     @GetMapping
-    public ResponseEntity<List<RestaurantTableDTO>> getAllTables() {
-        List<RestaurantTable> restaurantTableList = restaurantTableService.getAllTables();
+    public ResponseEntity<List<RestaurantTableDTO>> getAllTables(@PathVariable Long restaurantId) {
+        List<RestaurantTable> restaurantTableList = restaurantTableService.getAllTables(restaurantId);
 
         // Map RestaurantTable to RestaurantTableDTO
         List<RestaurantTableDTO> restaurantTableDTOList = restaurantTableList.stream()
@@ -57,13 +57,13 @@ public class RestaurantTableController {
     }
 
     @PostMapping
-    public ResponseEntity<?> createTable(@RequestBody RestaurantTableDTO restaurantTableDTO) {
+    public ResponseEntity<?> createTable(@PathVariable Long restaurantId, @RequestBody RestaurantTableDTO restaurantTableDTO) {
         try {
             RestaurantTable restaurantTable = new RestaurantTable();
             restaurantTable.setCapacity(restaurantTableDTO.getCapacity());
             restaurantTable.setNumber(restaurantTableDTO.getNumber());
 
-            return new ResponseEntity<>(restaurantTableService.createRestaurantTable(restaurantTable, restaurantTableDTO.getRestaurant_id()), HttpStatus.CREATED);
+            return new ResponseEntity<>(restaurantTableService.createRestaurantTable(restaurantTable, restaurantId), HttpStatus.CREATED);
         } catch (EntityNotFoundException e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
         } catch (IllegalStateException e) {
