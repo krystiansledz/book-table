@@ -78,12 +78,20 @@ public class Restaurant {
         return name;
     }
 
+    public void setName(String name) {
+        this.name = name;
+    }
+
     public UserType getUserType() {
         return userType;
     }
 
     public String getAddress() {
         return address;
+    }
+
+    public void setAddress(String address) {
+        this.address = address;
     }
 
     public List<RestaurantTable> getRestaurantTables() {
@@ -93,5 +101,4 @@ public class Restaurant {
     public List<BusinessHours> getBusinessHours() {
         return businessHours;
     }
-    
 }
