@@ -45,7 +45,8 @@ public class Restaurant {
     @Size(max = 120)
     private String address;
 
-    @OneToMany(mappedBy = "restaurant")
+    @OneToMany(mappedBy = "restaurant", cascade = CascadeType.ALL)
+    @JsonManagedReference
     private List<RestaurantTable> restaurantTables = new ArrayList<>();
 
     @OneToMany(mappedBy = "restaurant", cascade = CascadeType.ALL)
@@ -92,6 +93,5 @@ public class Restaurant {
     public List<BusinessHours> getBusinessHours() {
         return businessHours;
     }
-
-
+    
 }

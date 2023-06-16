@@ -42,8 +42,4 @@ public class RestaurantService implements UserDetailsService {
     public Restaurant updateRestaurant(Restaurant restaurant) {
         return restaurantRepository.save(restaurant);
     }
-
-    public void deleteRestaurant(Long id) {
-        restaurantRepository.deleteById(id);
-    }
 }

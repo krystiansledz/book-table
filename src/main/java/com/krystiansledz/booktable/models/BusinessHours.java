@@ -71,5 +71,14 @@ public class BusinessHours {
         this.restaurant = restaurant;
     }
 
-
+    @Override
+    public String toString() {
+        return "BusinessHours{" +
+                "id=" + id +
+                ", dayOfWeek=" + dayOfWeek +
+                ", openingTime=" + openingTime +
+                ", closingTime=" + closingTime +
+                ", restaurant=" + restaurant +
+                '}';
+    }
 }

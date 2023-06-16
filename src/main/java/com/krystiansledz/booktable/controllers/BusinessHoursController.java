@@ -40,20 +40,24 @@ public class BusinessHoursController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<BusinessHoursDTO> getBusinessHoursById(@PathVariable Long id) {
+    public ResponseEntity<?> getBusinessHoursById(@PathVariable Long id) {
         try {
             BusinessHours businessHours = businessHoursService.getBusinessHoursById(id);
+
             BusinessHoursDTO businessHoursDTO = new BusinessHoursDTO();
             BeanUtils.copyProperties(businessHours, businessHoursDTO);
             businessHoursDTO.setRestaurant(businessHours.getRestaurant());
+
             return new ResponseEntity<>(businessHoursDTO, HttpStatus.OK);
         } catch (EntityNotFoundException e) {
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
+        } catch (IllegalStateException e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
         }
     }
 
     @PostMapping
-    public ResponseEntity<BusinessHours> createBusinessHours(@RequestBody BusinessHoursDTO businessHoursDTO) {
+    public ResponseEntity<?> createBusinessHours(@RequestBody BusinessHoursDTO businessHoursDTO) {
         try {
             BusinessHours businessHours = new BusinessHours();
             businessHours.setDayOfWeek(businessHoursDTO.getDayOfWeek());
@@ -61,30 +65,36 @@ public class BusinessHoursController {
             businessHours.setClosingTime(businessHoursDTO.getClosingTime());
 
             return new ResponseEntity<>(businessHoursService.createBusinessHours(businessHours, businessHoursDTO.getRestaurant_id()), HttpStatus.CREATED);
-        } catch (IllegalArgumentException e) {
-            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        } catch (EntityNotFoundException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
+        } catch (IllegalStateException e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
         }
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<BusinessHours> updateBusinessHours(@PathVariable Long id, @RequestBody BusinessHoursDTO businessHoursDTO) {
+    public ResponseEntity<?> updateBusinessHours(@PathVariable Long id, @RequestBody BusinessHoursDTO businessHoursDTO) {
         try {
             BusinessHours businessHours = businessHoursService.getBusinessHoursById(id);
             businessHours.setDayOfWeek(businessHoursDTO.getDayOfWeek());
             businessHours.setOpeningTime(businessHoursDTO.getOpeningTime());
             businessHours.setClosingTime(businessHoursDTO.getClosingTime());
-            return new ResponseEntity<>(businessHoursService.updateBusinessHours(id, businessHours), HttpStatus.OK);
+            return new ResponseEntity<>(businessHoursService.updateBusinessHours(businessHours), HttpStatus.OK);
         } catch (EntityNotFoundException e) {
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
+        } catch (IllegalStateException e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
         }
     }
 
     @PatchMapping("/{id}")
-    public ResponseEntity<BusinessHours> partialUpdateBusinessHours(@PathVariable Long id, @RequestBody Map<String, Object> updates) {
+    public ResponseEntity<?> partialUpdateBusinessHours(@PathVariable Long id, @RequestBody Map<String, Object> updates) {
         try {
             return new ResponseEntity<>(businessHoursService.partialUpdateBusinessHours(id, updates), HttpStatus.OK);
         } catch (EntityNotFoundException e) {
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
+        } catch (IllegalStateException e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
         }
     }
 

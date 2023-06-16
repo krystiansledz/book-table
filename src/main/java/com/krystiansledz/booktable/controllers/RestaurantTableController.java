@@ -1,7 +1,10 @@
 package com.krystiansledz.booktable.controllers;
 
+import com.krystiansledz.booktable.dto.RestaurantTableDTO;
 import com.krystiansledz.booktable.models.RestaurantTable;
 import com.krystiansledz.booktable.security.services.RestaurantTableService;
+import jakarta.persistence.EntityNotFoundException;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -9,7 +12,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
+import java.util.stream.Collectors;
 
 @CrossOrigin(origins = "*", maxAge = 3600)
 @RestController
@@ -17,64 +20,89 @@ import java.util.Optional;
 public class RestaurantTableController {
 
     @Autowired
-    private RestaurantTableService tableService;
+    private RestaurantTableService restaurantTableService;
 
     @GetMapping
-    public ResponseEntity<List<RestaurantTable>> getAllTables() {
-        return new ResponseEntity<>(tableService.getAllTables(), HttpStatus.OK);
+    public ResponseEntity<List<RestaurantTableDTO>> getAllTables() {
+        List<RestaurantTable> restaurantTableList = restaurantTableService.getAllTables();
+
+        // Map RestaurantTable to RestaurantTableDTO
+        List<RestaurantTableDTO> restaurantTableDTOList = restaurantTableList.stream()
+                .map(restaurantTable -> {
+                    RestaurantTableDTO restaurantTableDTO = new RestaurantTableDTO();
+                    BeanUtils.copyProperties(restaurantTable, restaurantTableDTO);
+                    restaurantTableDTO.setRestaurant_id(restaurantTable.getRestaurant().getId());
+                    return restaurantTableDTO;
+                })
+                .collect(Collectors.toList());
+
+        return new ResponseEntity<>(restaurantTableDTOList, HttpStatus.OK);
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<RestaurantTable> getTableById(@PathVariable Long id) {
-        Optional<RestaurantTable> table = tableService.getTableById(id);
-        return table.map(value -> new ResponseEntity<>(value, HttpStatus.OK))
-                .orElseGet(() -> new ResponseEntity<>(HttpStatus.NOT_FOUND));
+    public ResponseEntity<?> getTableById(@PathVariable Long id) {
+        try {
+            RestaurantTable restaurantTable = restaurantTableService.getRestaurantTableById(id);
+
+            RestaurantTableDTO restaurantTableDTO = new RestaurantTableDTO();
+            BeanUtils.copyProperties(restaurantTable, restaurantTableDTO);
+            restaurantTableDTO.setRestaurant_id(restaurantTable.getRestaurant().getId());
+
+            return new ResponseEntity<>(restaurantTableDTO, HttpStatus.OK);
+        } catch (EntityNotFoundException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
+        } catch (IllegalStateException e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
+        }
     }
 
     @PostMapping
-    public ResponseEntity<RestaurantTable> createTable(@RequestBody RestaurantTable restaurantTable) {
-        return new ResponseEntity<>(tableService.createTable(restaurantTable), HttpStatus.CREATED);
+    public ResponseEntity<?> createTable(@RequestBody RestaurantTableDTO restaurantTableDTO) {
+        try {
+            RestaurantTable restaurantTable = new RestaurantTable();
+            restaurantTable.setCapacity(restaurantTableDTO.getCapacity());
+            restaurantTable.setNumber(restaurantTableDTO.getNumber());
+
+            return new ResponseEntity<>(restaurantTableService.createRestaurantTable(restaurantTable, restaurantTableDTO.getRestaurant_id()), HttpStatus.CREATED);
+        } catch (EntityNotFoundException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
+        } catch (IllegalStateException e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
+        }
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<RestaurantTable> updateTable(@PathVariable Long id, @RequestBody RestaurantTable restaurantTable) {
-        Optional<RestaurantTable> tableData = tableService.getTableById(id);
-        if (tableData.isPresent()) {
-            RestaurantTable updatedTable = tableData.get();
-            updatedTable.setNumber(restaurantTable.getNumber());
-            updatedTable.setCapacity(restaurantTable.getCapacity());
-            return new ResponseEntity<>(tableService.updateTable(updatedTable), HttpStatus.OK);
-        } else {
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+    public ResponseEntity<?> updateRestaurantTable(@PathVariable Long id, @RequestBody RestaurantTableDTO restaurantTableDTO) {
+        try {
+            RestaurantTable restaurantTable = restaurantTableService.getRestaurantTableById(id);
+            restaurantTable.setNumber(restaurantTableDTO.getNumber());
+            restaurantTable.setCapacity(restaurantTableDTO.getCapacity());
+            return new ResponseEntity<>(restaurantTableService.updateRestaurantTable(restaurantTable), HttpStatus.OK);
+        } catch (EntityNotFoundException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
+        } catch (IllegalStateException e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
         }
     }
 
     @PatchMapping("/{id}")
-    public ResponseEntity<RestaurantTable> partialUpdateTable(@PathVariable Long id, @RequestBody Map<String, Object> updates) {
-        Optional<RestaurantTable> tableData = tableService.getTableById(id);
-        if (tableData.isPresent()) {
-            RestaurantTable updatedTable = tableData.get();
-
-            for (String key : updates.keySet()) {
-                switch (key) {
-                    case "number" -> updatedTable.setNumber((Integer) updates.get(key));
-                    case "capacity" -> updatedTable.setCapacity((Integer) updates.get(key));
-                }
-            }
-            return new ResponseEntity<>(tableService.updateTable(updatedTable), HttpStatus.OK);
-        } else {
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+    public ResponseEntity<?> partialUpdateRestaurantTable(@PathVariable Long id, @RequestBody Map<String, Object> updates) {
+        try {
+            return new ResponseEntity<>(restaurantTableService.partialUpdateRestaurantTable(id, updates), HttpStatus.OK);
+        } catch (EntityNotFoundException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
+        } catch (IllegalStateException e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
         }
     }
 
-
     @DeleteMapping("/{id}")
-    public ResponseEntity<HttpStatus> deleteTable(@PathVariable Long id) {
+    public ResponseEntity<?> deleteTable(@PathVariable Long id) {
         try {
-            tableService.deleteTable(id);
+            restaurantTableService.deleteTable(id);
             return new ResponseEntity<>(HttpStatus.NO_CONTENT);
-        } catch (Exception e) {
-            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+        } catch (EntityNotFoundException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
         }
     }
 }
