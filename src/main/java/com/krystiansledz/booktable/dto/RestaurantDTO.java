@@ -25,6 +25,10 @@ public class RestaurantDTO {
         return email;
     }
 
+    public void setEmail(String email) {
+        this.email = email;
+    }
+
     public String getName() {
         return name;
     }
@@ -45,7 +49,15 @@ public class RestaurantDTO {
         return restaurantTables;
     }
 
+    public void setRestaurantTables(List<RestaurantTable> restaurantTables) {
+        this.restaurantTables = restaurantTables;
+    }
+
     public List<BusinessHours> getBusinessHours() {
         return businessHours;
+    }
+
+    public void setBusinessHours(List<BusinessHours> businessHours) {
+        this.businessHours = businessHours;
     }
 }

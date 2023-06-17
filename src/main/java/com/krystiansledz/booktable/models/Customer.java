@@ -1,5 +1,7 @@
 package com.krystiansledz.booktable.models;
 
+import com.fasterxml.jackson.annotation.JsonIdentityInfo;
+import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 import com.krystiansledz.booktable.enums.UserType;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Email;
@@ -11,6 +13,7 @@ import jakarta.validation.constraints.Size;
         uniqueConstraints = {
                 @UniqueConstraint(columnNames = "email")
         })
+@JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property = "id")
 public class Customer {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

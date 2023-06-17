@@ -10,6 +10,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
 
@@ -59,6 +60,17 @@ public class RestaurantController {
     public ResponseEntity<?> partialUpdateRestaurant(@PathVariable Long id, @RequestBody Map<String, Object> updates) {
         try {
             return new ResponseEntity<>(restaurantService.partialUpdateRestaurant(id, updates), HttpStatus.OK);
+        } catch (EntityNotFoundException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
+        } catch (IllegalStateException e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
+        }
+    }
+
+    @GetMapping("/{id}/available-tables")
+    public ResponseEntity<?> getRestaurantAvailableTables(@PathVariable Long id, @RequestParam LocalDateTime start, @RequestParam LocalDateTime end) {
+        try {
+            return new ResponseEntity<>(restaurantService.getRestaurantAvailableTables(id, start, end), HttpStatus.OK);
         } catch (EntityNotFoundException e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
         } catch (IllegalStateException e) {

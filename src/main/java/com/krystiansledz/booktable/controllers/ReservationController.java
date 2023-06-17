@@ -13,7 +13,7 @@ import java.util.List;
 
 @CrossOrigin(origins = "*", maxAge = 3600)
 @RestController
-@RequestMapping("/api/v1/reservations")
+@RequestMapping("/api/v1/restaurants/{restaurantId}/reservations")
 public class ReservationController {
 
     @Autowired

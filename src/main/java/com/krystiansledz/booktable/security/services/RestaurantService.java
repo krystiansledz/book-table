@@ -1,7 +1,13 @@
 package com.krystiansledz.booktable.security.services;
 
+import com.krystiansledz.booktable.models.BusinessHours;
+import com.krystiansledz.booktable.models.Reservation;
 import com.krystiansledz.booktable.models.Restaurant;
+import com.krystiansledz.booktable.models.RestaurantTable;
+import com.krystiansledz.booktable.repository.BusinessHoursRepository;
+import com.krystiansledz.booktable.repository.ReservationRepository;
 import com.krystiansledz.booktable.repository.RestaurantRepository;
+import com.krystiansledz.booktable.repository.RestaurantTableRepository;
 import com.krystiansledz.booktable.security.principals.RestaurantPrincipal;
 import jakarta.persistence.EntityNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -11,13 +17,23 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.DayOfWeek;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 @Service
 public class RestaurantService implements UserDetailsService {
     @Autowired
     RestaurantRepository restaurantRepository;
+    @Autowired
+    RestaurantTableRepository restaurantTableRepository;
+    @Autowired
+    ReservationRepository reservationRepository;
+    @Autowired
+    BusinessHoursRepository businessHoursRepository;
 
     @Override
     @Transactional
@@ -60,5 +76,33 @@ public class RestaurantService implements UserDetailsService {
         }
 
         return restaurantRepository.save(restaurant);
+    }
+
+    public List<RestaurantTable> getRestaurantAvailableTables(Long restaurantId, LocalDateTime start, LocalDateTime end) {
+        // Find the opening hours for the day of the week for start time
+        DayOfWeek reservationDayOfWeek = start.getDayOfWeek();
+        BusinessHours businessHours = businessHoursRepository.findByDayOfWeekAndRestaurantId(reservationDayOfWeek, restaurantId)
+                .orElseThrow(() -> new IllegalArgumentException("Restaurant is not open on " + reservationDayOfWeek));
+
+        // Check if reservation start and end times are within opening hours
+        LocalTime openingTime = businessHours.getOpeningTime();
+        LocalTime closingTime = businessHours.getClosingTime();
+        if (start.toLocalTime().isBefore(openingTime) || end.toLocalTime().isAfter(closingTime)) {
+            throw new IllegalArgumentException("Reservation time is outside of restaurant's opening hours");
+        }
+
+        // Find all tables for the restaurant
+        List<RestaurantTable> allTables = restaurantTableRepository.findAllByRestaurantId(restaurantId);
+
+        // Filter out tables which are reserved during the requested reservation time
+
+        return allTables.stream()
+                .filter(table -> {
+                    List<Reservation> tableReservations = reservationRepository.findByTableIdAndStartIsBetweenOrEndIsBetween(
+                            table.getId(), start, end, start, end);
+
+                    return tableReservations.isEmpty();
+                })
+                .collect(Collectors.toList());
     }
 }
