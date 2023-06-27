@@ -28,13 +28,13 @@ public class Reservation {
     @NotNull
     @ManyToOne
     @JoinColumn(name = "customer_id")
-    @JsonBackReference
+    @JsonBackReference(value = "customer-reservations")
     private Customer customer;
 
     @NotNull
     @ManyToOne
     @JoinColumn(name = "restaurant_table_id")
-    @JsonBackReference
+    @JsonBackReference(value = "restaurantTable-reservations")
     private RestaurantTable table;
 
     public Long getId() {

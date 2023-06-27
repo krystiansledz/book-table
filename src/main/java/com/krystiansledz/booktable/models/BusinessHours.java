@@ -31,7 +31,7 @@ public class BusinessHours {
     @NotNull
     @ManyToOne
     @JoinColumn(name = "restaurant_id")
-    @JsonBackReference
+    @JsonBackReference(value = "restaurant-businessHours")
     private Restaurant restaurant;
 
     public Long getId() {

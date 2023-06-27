@@ -28,7 +28,7 @@ public class RestaurantTable {
     @NotNull
     @ManyToOne
     @JoinColumn(name = "restaurant_id")
-    @JsonBackReference
+    @JsonBackReference(value = "restaurant-restaurantTables")
     private Restaurant restaurant;
 
     @OneToMany(mappedBy = "table")

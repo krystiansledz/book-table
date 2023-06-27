@@ -46,11 +46,11 @@ public class Restaurant {
     private String address;
 
     @OneToMany(mappedBy = "restaurant", cascade = CascadeType.ALL)
-    @JsonManagedReference
+    @JsonManagedReference(value = "restaurant-restaurantTables")
     private List<RestaurantTable> restaurantTables = new ArrayList<>();
 
     @OneToMany(mappedBy = "restaurant", cascade = CascadeType.ALL)
-    @JsonManagedReference
+    @JsonManagedReference(value = "restaurant-businessHours")
     private List<BusinessHours> businessHours = new ArrayList<>();
 
     public Restaurant() {
