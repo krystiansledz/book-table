@@ -1,9 +1,6 @@
 package com.krystiansledz.booktable.models;
 
-import com.fasterxml.jackson.annotation.JsonIdentityInfo;
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonManagedReference;
-import com.fasterxml.jackson.annotation.ObjectIdGenerators;
+import com.fasterxml.jackson.annotation.*;
 import com.krystiansledz.booktable.enums.UserType;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Email;
@@ -19,6 +16,7 @@ import java.util.List;
                 @UniqueConstraint(columnNames = "email")
         })
 @JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property = "id")
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public class Restaurant {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -66,8 +64,16 @@ public class Restaurant {
         return id;
     }
 
+    public void setId(Long id) {
+        this.id = id;
+    }
+
     public String getEmail() {
         return email;
+    }
+
+    public void setEmail(String email) {
+        this.email = email;
     }
 
     public String getPassword() {
@@ -98,7 +104,15 @@ public class Restaurant {
         return restaurantTables;
     }
 
+    public void setRestaurantTables(List<RestaurantTable> restaurantTables) {
+        this.restaurantTables = restaurantTables;
+    }
+
     public List<BusinessHours> getBusinessHours() {
         return businessHours;
+    }
+
+    public void setBusinessHours(List<BusinessHours> businessHours) {
+        this.businessHours = businessHours;
     }
 }

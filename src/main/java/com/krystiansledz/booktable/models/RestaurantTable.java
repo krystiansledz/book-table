@@ -1,9 +1,6 @@
 package com.krystiansledz.booktable.models;
 
-import com.fasterxml.jackson.annotation.JsonBackReference;
-import com.fasterxml.jackson.annotation.JsonIdentityInfo;
-import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.annotation.ObjectIdGenerators;
+import com.fasterxml.jackson.annotation.*;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 
@@ -13,6 +10,7 @@ import java.util.List;
 @Entity
 @Table(name = "restaurant_tables")
 @JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property = "id")
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public class RestaurantTable {
 
     @Id
@@ -31,7 +29,9 @@ public class RestaurantTable {
     @JsonBackReference(value = "restaurant-restaurantTables")
     private Restaurant restaurant;
 
-    @OneToMany(mappedBy = "table")
+
+    @OneToMany(mappedBy = "restaurantTable", cascade = CascadeType.ALL)
+    @JsonManagedReference(value = "restaurantTable-reservations")
     private List<Reservation> reservations = new ArrayList<>();
 
     public Integer getNumber() {

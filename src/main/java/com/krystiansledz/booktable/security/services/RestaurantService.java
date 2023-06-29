@@ -98,7 +98,7 @@ public class RestaurantService implements UserDetailsService {
 
         return allTables.stream()
                 .filter(table -> {
-                    List<Reservation> tableReservations = reservationRepository.findByTableIdAndStartIsBetweenOrEndIsBetween(
+                    List<Reservation> tableReservations = reservationRepository.findByRestaurantTableIdAndStartDateTimeIsBetweenOrEndDateTimeIsBetween(
                             table.getId(), start, end, start, end);
 
                     return tableReservations.isEmpty();

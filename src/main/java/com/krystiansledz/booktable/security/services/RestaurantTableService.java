@@ -30,6 +30,11 @@ public class RestaurantTableService {
         return restaurantTableRepository.findById(id).orElseThrow(EntityNotFoundException::new);
     }
 
+    public RestaurantTable getRestaurantTableByRestaurantIdAndId(Long restaurantId, Long restaurantTableId) {
+        return restaurantTableRepository.findByRestaurantIdAndId(restaurantId, restaurantTableId)
+                .orElseThrow(() -> new EntityNotFoundException("Could not find RestaurantTable with ID " + restaurantTableId + " for Restaurant with ID " + restaurantId));
+    }
+
     public RestaurantTable createRestaurantTable(RestaurantTable restaurantTable, Long restaurantId) {
         Restaurant restaurant = restaurantRepository.findById(restaurantId).orElseThrow(EntityNotFoundException::new);
         restaurantTable.setRestaurant(restaurant);

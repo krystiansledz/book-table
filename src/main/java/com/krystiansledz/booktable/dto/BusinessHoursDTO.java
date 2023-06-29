@@ -1,10 +1,11 @@
 package com.krystiansledz.booktable.dto;
 
-import com.krystiansledz.booktable.models.Restaurant;
+import com.fasterxml.jackson.annotation.JsonInclude;
 
 import java.time.DayOfWeek;
 import java.time.LocalTime;
 
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public class BusinessHoursDTO {
     private Long id;
     private DayOfWeek dayOfWeek;
@@ -40,8 +41,8 @@ public class BusinessHoursDTO {
         return restaurant_id;
     }
 
-    public void setRestaurant(Restaurant restaurant) {
-        this.restaurant_id = restaurant.getId();
+    public void setRestaurant(Long restaurant_id) {
+        this.restaurant_id = restaurant_id;
     }
 
     public Long getId() {

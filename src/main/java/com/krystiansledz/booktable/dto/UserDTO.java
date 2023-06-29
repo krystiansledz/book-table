@@ -1,7 +1,9 @@
 package com.krystiansledz.booktable.dto;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.krystiansledz.booktable.enums.UserType;
 
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public class UserDTO {
     private Long id;
     private String email;

@@ -1,5 +1,9 @@
 package com.krystiansledz.booktable.dto;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
+
+@JsonInclude(JsonInclude.Include.NON_NULL)
+
 public class RestaurantTableDTO {
     private Long id;
     private Integer number;

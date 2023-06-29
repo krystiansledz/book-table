@@ -1,9 +1,6 @@
 package com.krystiansledz.booktable.models;
 
-import com.fasterxml.jackson.annotation.JsonBackReference;
-import com.fasterxml.jackson.annotation.JsonIdentityInfo;
-import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.annotation.ObjectIdGenerators;
+import com.fasterxml.jackson.annotation.*;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 
@@ -12,18 +9,17 @@ import java.time.LocalDateTime;
 @Entity
 @Table(name = "reservations")
 @JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property = "id")
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public class Reservation {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @NotNull
-    @Column(name = "start_time")
-    private LocalDateTime start;
+    private LocalDateTime startDateTime;
 
     @NotNull
-    @Column(name = "end_time")
-    private LocalDateTime end;
+    private LocalDateTime endDateTime;
 
     @NotNull
     @ManyToOne
@@ -35,7 +31,7 @@ public class Reservation {
     @ManyToOne
     @JoinColumn(name = "restaurant_table_id")
     @JsonBackReference(value = "restaurantTable-reservations")
-    private RestaurantTable table;
+    private RestaurantTable restaurantTable;
 
     public Long getId() {
         return id;
@@ -45,20 +41,20 @@ public class Reservation {
         this.id = id;
     }
 
-    public LocalDateTime getStart() {
-        return start;
+    public LocalDateTime getStartDateTime() {
+        return startDateTime;
     }
 
-    public void setStart(LocalDateTime start) {
-        this.start = start;
+    public void setStartDateTime(LocalDateTime start) {
+        this.startDateTime = start;
     }
 
-    public LocalDateTime getEnd() {
-        return end;
+    public LocalDateTime getEndDateTime() {
+        return endDateTime;
     }
 
-    public void setEnd(LocalDateTime end) {
-        this.end = end;
+    public void setEndDateTime(LocalDateTime end) {
+        this.endDateTime = end;
     }
 
     @JsonProperty("customer_id")
@@ -72,10 +68,21 @@ public class Reservation {
 
     @JsonProperty("restaurant_table_id")
     public RestaurantTable getRestaurantTable() {
-        return table;
+        return restaurantTable;
     }
 
     public void setRestaurantTable(@JsonProperty("restaurant_table_id") RestaurantTable table) {
-        this.table = table;
+        this.restaurantTable = table;
+    }
+
+    @Override
+    public String toString() {
+        return "Reservation{" +
+                "id=" + id +
+                ", startDateTime=" + startDateTime +
+                ", endDateTime=" + endDateTime +
+                ", customer=" + customer +
+                ", restaurantTable=" + restaurantTable +
+                '}';
     }
 }

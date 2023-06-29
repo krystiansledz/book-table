@@ -24,8 +24,8 @@ public class BusinessHoursService {
     @Autowired
     private RestaurantRepository restaurantRepository;
 
-    public List<BusinessHours> getAllBusinessHours() {
-        return businessHoursRepository.findAll();
+    public List<BusinessHours> getAllBusinessHours(Long restaurantId) {
+        return businessHoursRepository.findAllByRestaurantId(restaurantId);
     }
 
     public BusinessHours getBusinessHoursById(Long id) {
