@@ -13,7 +13,8 @@ import java.util.List;
 
 @Repository
 public interface ReservationRepository extends JpaRepository<Reservation, Long> {
-    List<Reservation> findByRestaurantTableIdAndStartDateTimeIsBetweenOrEndDateTimeIsBetween(Long restaurantTableId, LocalDateTime start_from, LocalDateTime start_to, LocalDateTime end_from, LocalDateTime end_to);
+    @Query("SELECT r FROM Reservation r WHERE r.startDateTime <= :endTime AND r.endDateTime >= :startTime")
+    List<Reservation> findAllByStartDateTimeLessThanEqualAndEndDateTimeGreaterThanEqual(@Param("endTime") LocalDateTime endTime, @Param("startTime") LocalDateTime startTime);
 
     List<Reservation> findAllByRestaurantTable_Restaurant_Id(Long restaurantId);
 

@@ -33,6 +33,8 @@ public class Reservation {
     @JsonBackReference(value = "restaurantTable-reservations")
     private RestaurantTable restaurantTable;
 
+    private Integer rating;
+
     public Long getId() {
         return id;
     }
@@ -83,6 +85,18 @@ public class Reservation {
                 ", endDateTime=" + endDateTime +
                 ", customer=" + customer +
                 ", restaurantTable=" + restaurantTable +
+                ", rating=" + rating +
                 '}';
+    }
+
+    public Integer getRating() {
+        return rating;
+    }
+
+    public void setRating(Integer rating) {
+        if (rating < 1 || rating > 5) {
+            throw new IllegalArgumentException("Rating must be between 1 and 5");
+        }
+        this.rating = rating;
     }
 }

@@ -51,6 +51,9 @@ public class Restaurant {
     @JsonManagedReference(value = "restaurant-businessHours")
     private List<BusinessHours> businessHours = new ArrayList<>();
 
+    @Transient
+    private Double rating;
+
     public Restaurant() {
     }
 
@@ -114,5 +117,13 @@ public class Restaurant {
 
     public void setBusinessHours(List<BusinessHours> businessHours) {
         this.businessHours = businessHours;
+    }
+
+    public Double getRating() {
+        return rating;
+    }
+
+    public void setRating(Double rating) {
+        this.rating = rating;
     }
 }

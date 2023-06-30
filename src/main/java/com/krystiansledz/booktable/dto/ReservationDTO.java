@@ -15,6 +15,8 @@ public class ReservationDTO {
     private Long restaurantTable_id;
     private RestaurantTable restaurantTable;
     private Restaurant restaurant;
+    private Integer rating;
+
 
     public Long getId() {
         return id;
@@ -70,5 +72,30 @@ public class ReservationDTO {
 
     public void setRestaurantTable(RestaurantTable restaurantTable) {
         this.restaurantTable = restaurantTable;
+    }
+
+    public Integer getRating() {
+        return rating;
+    }
+
+    public void setRating(Integer rating) {
+        if (rating < 1 || rating > 5) {
+            throw new IllegalArgumentException("Rating must be between 1 and 5");
+        }
+        this.rating = rating;
+    }
+
+    @Override
+    public String toString() {
+        return "ReservationDTO{" +
+                "id=" + id +
+                ", startDateTime=" + startDateTime +
+                ", endDateTime=" + endDateTime +
+                ", customer_id=" + customer_id +
+                ", restaurantTable_id=" + restaurantTable_id +
+                ", restaurantTable=" + restaurantTable +
+                ", restaurant=" + restaurant +
+                ", rating=" + rating +
+                '}';
     }
 }

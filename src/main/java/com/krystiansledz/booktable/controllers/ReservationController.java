@@ -1,5 +1,6 @@
 package com.krystiansledz.booktable.controllers;
 
+import com.krystiansledz.booktable.dto.RatingDTO;
 import com.krystiansledz.booktable.dto.ReservationDTO;
 import com.krystiansledz.booktable.models.Customer;
 import com.krystiansledz.booktable.models.Reservation;
@@ -9,12 +10,12 @@ import com.krystiansledz.booktable.security.jwt.JwtUtils;
 import com.krystiansledz.booktable.security.services.CustomerService;
 import com.krystiansledz.booktable.security.services.ReservationService;
 import jakarta.persistence.EntityNotFoundException;
-import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDateTime;
 import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -42,7 +43,13 @@ public class ReservationController {
             List<ReservationDTO> reservationDTOList = reservations.stream()
                     .map(reservation -> {
                         ReservationDTO reservationDTO = new ReservationDTO();
-                        BeanUtils.copyProperties(reservation, reservationDTO);
+
+                        reservationDTO.setId(reservation.getId());
+                        reservationDTO.setStartDateTime(reservation.getStartDateTime());
+                        reservationDTO.setEndDateTime(reservation.getEndDateTime());
+                        if (reservation.getRating() != null) {
+                            reservationDTO.setRating(reservation.getRating());
+                        }
                         reservationDTO.setRestaurantTable_id(null);
 
                         RestaurantTable originalRestaurantTable = reservation.getRestaurantTable();
@@ -82,6 +89,32 @@ public class ReservationController {
         }
     }
 
+    @PutMapping("/{id}/rating")
+    public ResponseEntity<?> setReservationRating(@RequestHeader("Authorization") String token, @PathVariable Long id, @RequestBody RatingDTO ratingDTO) {
+        try {
+            String email = jwtUtils.getUserNameFromJwtToken(token.replace("Bearer ", ""));
+            Customer customer = customerService.findCustomerByEmail(email);
+            Reservation reservation = reservationService.getReservationById(id);
+
+            if (!reservation.getCustomer().getId().equals(customer.getId())) {
+                return new ResponseEntity<>(HttpStatus.FORBIDDEN);
+            }
+
+            if (reservation.getEndDateTime().isAfter(LocalDateTime.now())) {
+                return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+            }
+
+            reservation.setRating(ratingDTO.getRating());
+            reservationService.updateReservation(reservation);
+
+            return new ResponseEntity<>(HttpStatus.OK);
+        } catch (EntityNotFoundException e) {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        } catch (IllegalArgumentException e) {
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        }
+    }
+
     @DeleteMapping("/{id}")
     public ResponseEntity<?> deleteReservation(@RequestHeader("Authorization") String token, @PathVariable Long id) {
         try {
@@ -92,6 +125,10 @@ public class ReservationController {
 
             if (!reservation.getCustomer().getEmail().equals(customer.getEmail())) {
                 return new ResponseEntity<>("You don't have a reservation with the given id", HttpStatus.FORBIDDEN);
+            }
+
+            if (reservation.getStartDateTime().isBefore(LocalDateTime.now())) {
+                return new ResponseEntity<>("You cannot delete a reservation that is currently in progress or has ended", HttpStatus.BAD_REQUEST);
             }
 
             reservationService.deleteReservation(id);

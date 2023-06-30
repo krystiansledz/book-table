@@ -47,21 +47,18 @@ public class ReservationService {
         LocalDateTime end = reservation.getEndDateTime();
         RestaurantTable table = reservation.getRestaurantTable();
 
-        // Sprawdzanie, czy istnieje jakakolwiek rezerwacja, która pokrywałaby się z zamierzonym czasem.
         List<Reservation> overlappingReservations = reservationRepository.findAllByRestaurantTableAndTimeRange(table, start, end);
 
         if (overlappingReservations.isEmpty()) {
-            // Jeżeli nie ma pokrywających się rezerwacji, to rezerwacja jest możliwa.
             return reservationRepository.save(reservation);
         } else {
-            // Jeżeli istnieją pokrywające się rezerwacje, rzucamy wyjątek.
             throw new IllegalStateException("Table is not available during the requested time.");
         }
     }
 
 
-    public Reservation updateReservation(Reservation reservation) {
-        return reservationRepository.save(reservation);
+    public void updateReservation(Reservation reservation) {
+        reservationRepository.save(reservation);
     }
 
     public void deleteReservation(Long id) {

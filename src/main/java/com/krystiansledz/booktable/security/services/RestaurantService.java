@@ -11,6 +11,7 @@ import com.krystiansledz.booktable.repository.RestaurantTableRepository;
 import com.krystiansledz.booktable.security.principals.RestaurantPrincipal;
 import jakarta.persistence.EntityNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Sort;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -44,8 +45,28 @@ public class RestaurantService implements UserDetailsService {
         return RestaurantPrincipal.build(restaurant);
     }
 
-    public List<Restaurant> getAllRestaurants() {
-        return restaurantRepository.findAll();
+    public List<Restaurant> getAllRestaurants(String name, String sortBy, String direction) {
+        Sort sort = Sort.by(sortBy);
+        if (direction.equals("desc")) {
+            sort = sort.descending();
+        } else if (direction.equals("asc")) {
+            sort = sort.ascending();
+        } else {
+            sort = null;
+        }
+
+
+        if (name == null || name.isEmpty()) {
+            if (sort == null) {
+                return restaurantRepository.findAll();
+            }
+            return restaurantRepository.findAll(sort);
+        } else {
+            if (sort == null) {
+                return restaurantRepository.findByNameContainingIgnoreCase(name);
+            }
+            return restaurantRepository.findByNameContainingIgnoreCase(name, sort);
+        }
     }
 
     public Restaurant getRestaurantById(Long id) {
@@ -94,15 +115,36 @@ public class RestaurantService implements UserDetailsService {
         // Find all tables for the restaurant
         List<RestaurantTable> allTables = restaurantTableRepository.findAllByRestaurantId(restaurantId);
 
-        // Filter out tables which are reserved during the requested reservation time
+        // Find all reservations that overlap with the requested reservation time
+        List<Reservation> overlappingReservations = reservationRepository.findAllByStartDateTimeLessThanEqualAndEndDateTimeGreaterThanEqual(end, start);
 
-        return allTables.stream()
-                .filter(table -> {
-                    List<Reservation> tableReservations = reservationRepository.findByRestaurantTableIdAndStartDateTimeIsBetweenOrEndDateTimeIsBetween(
-                            table.getId(), start, end, start, end);
-
-                    return tableReservations.isEmpty();
-                })
+        // Get a list of all tables that are already reserved
+        List<RestaurantTable> reservedTables = overlappingReservations.stream()
+                .map(Reservation::getRestaurantTable)
                 .collect(Collectors.toList());
+
+        // Filter out tables that are already reserved
+        return allTables.stream()
+                .filter(table -> !reservedTables.contains(table))
+                .collect(Collectors.toList());
+    }
+
+    public Double calculateAverageRating(Restaurant restaurant) {
+        List<RestaurantTable> tables = restaurant.getRestaurantTables();
+        double sum = 0.0;
+        int count = 0;
+
+        for (RestaurantTable table : tables) {
+            List<Reservation> reservations = table.getReservations();
+            for (Reservation reservation : reservations) {
+                Integer rating = reservation.getRating();
+                if (rating != null) {
+                    sum += rating;
+                    count++;
+                }
+            }
+        }
+
+        return count > 0 ? sum / count : null;
     }
 }
