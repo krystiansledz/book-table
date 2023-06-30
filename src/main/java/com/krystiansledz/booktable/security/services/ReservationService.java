@@ -43,9 +43,18 @@ public class ReservationService {
     }
 
     public Reservation createReservation(Reservation reservation) {
+        LocalDateTime now = LocalDateTime.now();
         LocalDateTime start = reservation.getStartDateTime();
         LocalDateTime end = reservation.getEndDateTime();
         RestaurantTable table = reservation.getRestaurantTable();
+
+        if (start.isBefore(now)) {
+            throw new IllegalArgumentException("Start time of the reservation cannot be in the past.");
+        }
+
+        if (start.isAfter(end)) {
+            throw new IllegalArgumentException("Start time of the reservation cannot be after the end time.");
+        }
 
         List<Reservation> overlappingReservations = reservationRepository.findAllByRestaurantTableAndTimeRange(table, start, end);
 

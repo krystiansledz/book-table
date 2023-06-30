@@ -46,15 +46,16 @@ public class RestaurantService implements UserDetailsService {
     }
 
     public List<Restaurant> getAllRestaurants(String name, String sortBy, String direction) {
-        Sort sort = Sort.by(sortBy);
-        if (direction.equals("desc")) {
-            sort = sort.descending();
-        } else if (direction.equals("asc")) {
-            sort = sort.ascending();
-        } else {
-            sort = null;
-        }
+        Sort sort = null;
 
+        if (sortBy != null) {
+            sort = Sort.by(sortBy);
+            if (direction != null && direction.equals("desc")) {
+                sort = sort.descending();
+            } else if (direction != null && direction.equals("asc")) {
+                sort = sort.ascending();
+            }
+        }
 
         if (name == null || name.isEmpty()) {
             if (sort == null) {
